@@ -8,7 +8,7 @@
 }
 
 .box {
-  width: 84vw;
+  width: 80vw;
   margin-top: 8vh;
   margin-bottom: 8vh;
   /* height: 84vh; */
@@ -16,7 +16,7 @@
   border-radius: 10px;
   display: flex;
   flex-direction: column;
-  padding-top: 4vh;
+  padding-top: 8vh;
   padding-left: 2vw;
   padding-right: 2vw;
   padding-bottom: 4vh;
@@ -25,11 +25,12 @@
 .info {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 }
 
 .img {
+  margin-left: 2vw;
   border-radius: 10px;
 }
 
@@ -40,11 +41,12 @@
   /* align-items: center; */
   /* background: purple; */
   width: 40vw;
-  margin-right: 4vw;
+  margin-right: 3vw;
+  margin-left: 3vw;
 }
 
 .name {
-  font-size: 4rem;
+  font-size: 3.5rem;
   font-weight: 600;
   margin-top: 16px;
 }
@@ -58,6 +60,7 @@
   margin-top: 16px;
   color: #6d6d6d;
   margin-right: 4vw;
+  white-space: pre-line;
 }
 
 .contactinfo {
@@ -78,7 +81,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 4vh;
+  margin-top: 6vh;
 }
 
 .grid {

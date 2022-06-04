@@ -6,18 +6,29 @@ import { useEffect, useState } from 'react';
 import 'spinkit/spinkit.css';
 import Loading from '../components/Loading';
 import randomstring from 'randomstring';
+import apiURL from '../utils/url';
 
 export default function Edit() {
   const [session, loading] = useSession();
   const [skills, setSkills] = useState([]);
   const [projects, setProjects] = useState([]);
-  const [data, setData] = useState({});
+  const [data, setData] = useState({
+    username: '',
+    aboutMe: '',
+    email: '',
+    phone: '',
+    address: '',
+    color: '',
+    skills: [],
+    projects: [],
+    url: '',
+  });
 
   // console.log('session', session);
   useEffect(async () => {
     if (session) {
       console.log('yes session');
-      const response = await fetch(`http://localhost:5000/api/create`, {
+      const response = await fetch(`${apiURL}/api/create`, {
         method: 'POST',
         body: JSON.stringify({ email: session.user.email }),
         headers: {
@@ -30,18 +41,27 @@ export default function Edit() {
   }, [session]);
 
   useEffect(async () => {
-    if (session) {
-      const response = await fetch(`http://localhost:5000/api/get`, {
+    if (session && data.url === '') {
+      console.log('getting user data');
+      const response = await fetch(`${apiURL}/api/get`, {
         method: 'POST',
         body: JSON.stringify({ email: session.user.email }),
         headers: {
           'Content-Type': 'application/json',
         },
       });
+      // const data1 = { ...data };
       const data1 = await response.json();
+      if (!data1.url) {
+        data1.url = randomstring.generate({ length: 7, charset: 'numeric' });
+      }
       setData(data1);
+      console.log('edited data');
+      setSkills(data1.skills);
+      setProjects(data1.projects);
     }
-  });
+  }),
+    [session];
 
   useEffect(() => {
     console.log(skills);
@@ -53,7 +73,12 @@ export default function Edit() {
           <Navbar />
           <div className={styles.textfields}>
             <div className={styles.textfieldsdiv}>
-              <div className={styles.selected}>{`portoliocreator.netlify.app/portfolio/${data.url}`}</div>
+              <a
+                href={`https://portfoliocreator.netlify.app/portfolio/${data.url}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.selected}
+              >{`https://portoliocreator.netlify.app/${data.url}`}</a>
             </div>
             <form
               className={styles.form}
@@ -126,7 +151,7 @@ export default function Edit() {
                 />
               </div>
               <div className={styles['skills-container']}>
-                {data.skills.map((name, i) => (
+                {skills.map((name, i) => (
                   <div
                     key={name + i.toString()}
                     className={styles.textfieldsdiv}
@@ -179,7 +204,7 @@ export default function Edit() {
                 </div>
               </div>
               <div className={styles['projects-container']}>
-                {data.projects.map((name, i) => (
+                {projects.map((name, i) => (
                   <div
                     key={name + i.toString()}
                     className={styles.textfieldsdiv}
@@ -234,7 +259,7 @@ export default function Edit() {
               <div className={styles.textfieldsdiv}>
                 <button
                   type="submit"
-                  onClick={async () => {
+                  onClick={() => {
                     const username = document.getElementById('name').value;
                     const email = session.user.email;
                     const image = document.getElementById('image').value;
@@ -244,29 +269,48 @@ export default function Edit() {
                     const color = document.getElementById('color').value;
                     const address = document.getElementById('address').value;
                     const aboutMe = document.getElementById('aboutme').value;
-                    const url = String(
-                      randomstring.generate({ length: 7, charset: 'numeric' })
-                    );
-
-                    await fetch(`http://localhost:5000/api/update`, {
-                      method: 'POST',
-                      body: JSON.stringify({
-                        username,
-                        email,
-                        image,
-                        profession,
-                        phone,
-                        color,
-                        address,
-                        aboutMe,
-                        skills,
-                        projects,
-                        url,
-                      }),
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
+                    // const url = String(
+                    //   randomstring.generate({ length: 7, charset: 'numeric' })
+                    // );
+                    console.log(aboutMe);
+                    setData({
+                      ...data,
+                      username,
+                      email,
+                      image,
+                      profession,
+                      phone,
+                      color,
+                      address,
+                      aboutMe,
+                      skills,
+                      projects,
+                      url: data.url,
                     });
+
+                    async function updateUser() {
+                      console.log(data.aboutMe);
+                      await fetch(`${apiURL}/api/update`, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                          username,
+                          email,
+                          image,
+                          profession,
+                          phone,
+                          color,
+                          address,
+                          aboutMe,
+                          skills,
+                          projects,
+                          url: data.url,
+                        }),
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                      });
+                    }
+                    updateUser();
                   }}
                   className={styles.button}
                 >
@@ -275,7 +319,9 @@ export default function Edit() {
                 <button
                   className={styles.button}
                   onClick={() => {
-                    signOut();
+                    signOut({
+                      callbackUrl: 'https://portfoliocreator.vercel.app',
+                    });
                   }}
                 >
                   Sign Out
@@ -287,7 +333,7 @@ export default function Edit() {
       ) : loading ? (
         <Loading />
       ) : (
-        <div>Access Denied, Please Sign In first </div>
+        <div>Access Denied, Please Sign In first https://portfoliocreator.vercel.app</div>
       )}
     </div>
   );

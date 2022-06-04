@@ -4,15 +4,11 @@ import { useRouter } from 'next/router';
 import Card from '../../components/Card';
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
+import apiURL from '../../utils/url';
 
-export default function Portfolio({
-  children,
-  as,
-  settings = {},
-  title = 'default text',
-}) {
-  const router = useRouter();
-  const { id } = router.query;
+export default function Portfolio({ user }) {
+  // const { id } = router.query;
+  console.log('user', user);
   const [loading, setLoading] = useState(true);
   const [portfolio, setPortfolio] = useState({
     username: 'Loading...',
@@ -21,30 +17,37 @@ export default function Portfolio({
     phone: 'Loading...',
     address: 'Loading...',
     color: '#181818',
-    skills: ['Loading...'],
-    projects: ['Loading...'],
+    skills: ['Loading...', 'Loading...', 'Loading...'],
+    projects: ['Loading...', 'Loading...', 'Loading...'],
   });
 
+  useEffect(() => {
+    setPortfolio(user);
+  }, [user]);
+
   // console.log(id);
-  useEffect(async () => {
-    if (router.isReady) {
-      const { id } = router.query;
-      console.log(`loading ${id}`);
-      if (id) {
-        const response = await fetch(`http://localhost:5000/api/getURL`, {
-          method: 'POST',
-          body: JSON.stringify({ url: id }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        const user = await response.json();
-        console.log(user);
-        setPortfolio(user);
-        document.title = `Portfolio`;
-      }
-    }
-  }, [router.isReady]);
+  // useEffect(() => {
+  //   if (router.isReady) {
+  //     const { id } = router.query;
+  //     console.log(`loading ${id}`);
+  //     async function fetchData() {
+  //       if (id) {
+  //         const response = await fetch(`${apiURL}/api/getURL`, {
+  //           method: 'POST',
+  //           body: JSON.stringify({ url: id }),
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //           },
+  //         });
+  //         const user = await response.json();
+  //         console.log(user);
+  //         setPortfolio(user);
+  //         document.title = `Portfolio`;
+  //       }
+  //     }
+  //     fetchData();
+  //   }
+  // }, [router.isReady, router.query]);
   return portfolio ? (
     <div
       className={styles.container}
@@ -108,4 +111,21 @@ export default function Portfolio({
       <div className={styles.notfound}>Error: Portfolio Not Found</div>
     </div>
   );
+}
+
+export async function getServerSideProps(context) {
+  const id = context.params.id;
+  console.log(`loading ${id}`);
+  if (id) {
+    const response = await fetch(`${apiURL}/api/getURL`, {
+      method: 'POST',
+      body: JSON.stringify({ url: id }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const user = await response.json();
+    console.log(user);
+    return { props: { user } };
+  }
 }

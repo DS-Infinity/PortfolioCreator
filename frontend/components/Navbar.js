@@ -4,9 +4,9 @@ export default function Navbar() {
   return (
     <div className={styles.nav}>
       <ul className={styles.navlinks} id="nav-links">
-        <li>
+        {/* <li>
           <a href="">Home</a>
-        </li>
+        </li> */}
         <li>
           <a href="edit">Your Portfolio</a>
         </li>

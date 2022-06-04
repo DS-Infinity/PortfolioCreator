@@ -2,14 +2,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const { urlencoded } = express;
 require('dotenv').config();
-const User = require('./models/user');
-// const cors = require('./cors');
-
-// const somethingRouter = require('./routes/routes');
-
-// const connectDB = require('./utils/connectDB');
-
-// connectDB();
+const User = require('./models/User');
 
 const app = express();
 
@@ -17,14 +10,18 @@ mongoose
   .connect(process.env.DATABASE_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useFindAndModify: true,
+    useFindAndModify: false,
     useCreateIndex: true,
   })
   .then(() => console.log('Connected to MongoDB.......'))
   .catch((err) => console.log(err));
 
 app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.header(
+    'Access-Control-Allow-Origin',
+    // 'https://portfoliocreator.vercel.app'
+    'localhost:3000'
+  );
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE');
   res.header(
@@ -49,6 +46,8 @@ app.post('/api/update', async (req, res) => {
   const user = req.body;
   const { email } = req.body;
   const url = user.url;
+
+  console.log(user);
 
   const userFromDB = await User.findOne({ email }).lean();
 
@@ -77,6 +76,7 @@ app.post('/api/update', async (req, res) => {
     ).lean();
   }
 
+  console.log('updated');
   res.json({ done: 'yes' });
 });
 
@@ -86,7 +86,7 @@ app.post('/api/create', async (req, res) => {
     const userFromDB = await User.findOne({
       email: user.email,
     }).catch((err) => console.log('==> User not found.'));
-    console.log(user, userFromDB);
+    // console.log(user, userFromDB);
     if (userFromDB) {
       console.log('==> User already in DB, so new instance is not created.');
       res.json({
